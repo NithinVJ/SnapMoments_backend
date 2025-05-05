@@ -1,5 +1,6 @@
 package com.example.photobook.Controller;
 
+import com.example.photobook.Entity.UserEntity;
 import com.example.photobook.Model.UserModel;
 import com.example.photobook.Response.Response;
 import com.example.photobook.Service.UserService;
@@ -34,8 +35,8 @@ public class UserController {
     public ResponseEntity<?> loginUser(@RequestBody UserModel userModel) {
 
         try {
-            userService.authenticateUser(userModel.getEmail(), userModel.getPassword());
-            return Response.generate("login Sucessfully", null, HttpStatus.OK);
+            UserEntity userEntity=userService.authenticateUser(userModel.getEmail(), userModel.getPassword());
+            return ResponseEntity.ok(userEntity);
         } catch (Validation validation) {
             return Response.generate(validation.getError(), "Failed", HttpStatus.BAD_REQUEST);
         }

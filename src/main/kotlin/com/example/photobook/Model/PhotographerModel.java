@@ -1,7 +1,11 @@
 package com.example.photobook.Model;
 
+import com.example.photobook.Entity.Availability;
+import com.example.photobook.Entity.Pricing;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,15 +17,25 @@ public class PhotographerModel {
     private String specialty;
     private String location;
     private String bio;
+
+    @ElementCollection
     private List<String> tags;
-    private List<String> availabilityDates;
-    private List<String> imageUrls; // Stores image file names/URLs
-    private String pricingInfo;
+
+    @ElementCollection
+    @CollectionTable(name = "photographer_availability", joinColumns = @JoinColumn(name = "photographer_id"))
+    private List<Availability> availabilityDates;
+
+    @ElementCollection
+    private List<String> imageUrls;
+
+    @ElementCollection
+    @CollectionTable(name = "photographer_pricing", joinColumns = @JoinColumn(name = "photographer_id"))
+    private List<Pricing> pricingPlans;
 
     public PhotographerModel() {
     }
 
-    public PhotographerModel(String fullName, String specialty, String location, String bio, List<String> tags, List<String> availabilityDates, List<String> imageUrls, String pricingInfo) {
+    public PhotographerModel(String fullName, String specialty, String location, String bio, List<String> tags, List<Availability> availabilityDates, List<String> imageUrls, List<Pricing> pricingPlans) {
         this.fullName = fullName;
         this.specialty = specialty;
         this.location = location;
@@ -29,7 +43,7 @@ public class PhotographerModel {
         this.tags = tags;
         this.availabilityDates = availabilityDates;
         this.imageUrls = imageUrls;
-        this.pricingInfo = pricingInfo;
+        this.pricingPlans = pricingPlans;
     }
 
     public String getFullName() {
@@ -72,11 +86,11 @@ public class PhotographerModel {
         this.tags = tags;
     }
 
-    public List<String> getAvailabilityDates() {
+    public List<Availability> getAvailabilityDates() {
         return availabilityDates;
     }
 
-    public void setAvailabilityDates(List<String> availabilityDates) {
+    public void setAvailabilityDates(List<Availability> availabilityDates) {
         this.availabilityDates = availabilityDates;
     }
 
@@ -88,11 +102,11 @@ public class PhotographerModel {
         this.imageUrls = imageUrls;
     }
 
-    public String getPricingInfo() {
-        return pricingInfo;
+    public List<Pricing> getPricingPlans() {
+        return pricingPlans;
     }
 
-    public void setPricingInfo(String pricingInfo) {
-        this.pricingInfo = pricingInfo;
+    public void setPricingPlans(List<Pricing> pricingPlans) {
+        this.pricingPlans = pricingPlans;
     }
 }

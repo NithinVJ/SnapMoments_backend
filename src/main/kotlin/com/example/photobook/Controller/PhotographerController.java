@@ -1,9 +1,15 @@
 package com.example.photobook.Controller;
 
 import com.example.photobook.Entity.PhotographerEntity;
+import com.example.photobook.Entity.UserEntity;
+import com.example.photobook.Repository.PhotographerRepository;
+import com.example.photobook.Repository.UserRepository;
 import com.example.photobook.Service.PhotographerService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -22,6 +28,10 @@ public class PhotographerController {
 
     @Autowired
     private PhotographerService photographerService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PhotographerRepository photographerRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -61,4 +71,55 @@ public class PhotographerController {
     public ResponseEntity<List<PhotographerEntity>> getAllPortfolios() {
         return ResponseEntity.ok(photographerService.getAllPortfolios());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PhotographerEntity> getPhotographerById(@PathVariable Long id) {
+        PhotographerEntity photographer = photographerService.getPhotographerById(id);
+        if (photographer != null) {
+            return ResponseEntity.ok(photographer);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<?> getPhotographerByUserId(@PathVariable Long userId) {
+        // Check if user exists
+        Optional<UserEntity> userOpt = userRepository.findById(userId);
+        if (!userOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Invalid user ID: " + userId);
+        }
+
+        // Fetch photographer by user
+        Optional<PhotographerEntity> photographerOpt = photographerRepository.findByUserId(userId);
+        if (!photographerOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No photographer profile found for user ID: " + userId);
+        }
+
+        return ResponseEntity.ok(photographerOpt.get());
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updatePhotographer(
+            @PathVariable Long id,
+            @RequestPart("photographer") String photographerJson,
+            @RequestPart(value = "images", required = false) List<MultipartFile> files) {
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            PhotographerEntity photographerData = objectMapper.readValue(photographerJson, PhotographerEntity.class);
+
+            PhotographerEntity updatedPhotographer = photographerService.updatePhotographer(id, photographerData, files);
+            return ResponseEntity.ok(updatedPhotographer);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.badRequest().body("Invalid photographer data format");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating photographer");
+        }
+    }
 }
+

@@ -1,16 +1,13 @@
 package com.example.photobook.Entity;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+
 import java.util.List;
 
 @Entity
 @Table(name="photographers")
 @JsonIgnoreProperties(ignoreUnknown = true)
-
 public class PhotographerEntity {
 
     @Id
@@ -20,26 +17,30 @@ public class PhotographerEntity {
     private String fullName;
     private String specialty;
     private String location;
-
-    @Column(length = 1000)
     private String bio;
 
     @ElementCollection
     private List<String> tags;
 
     @ElementCollection
-    private List<String> availabilityDates;
+    @CollectionTable(name = "photographer_availability", joinColumns = @JoinColumn(name = "photographer_id"))
+    private List<Availability> availabilityDates;
 
     @ElementCollection
-    private List<String> imageUrls; // Stores image file names/URLs
+    private List<String> imageUrls;
 
-    @Column(length = 1000)
-    private String pricingInfo;
+    @ElementCollection
+    @CollectionTable(name = "photographer_pricing", joinColumns = @JoinColumn(name = "photographer_id"))
+    private List<Pricing> pricingPlans;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     public PhotographerEntity() {
     }
 
-    public PhotographerEntity(Long id, String fullName, String specialty, String location, String bio, List<String> tags, List<String> availabilityDates, List<String> imageUrls, String pricingInfo) {
+    public PhotographerEntity(Long id, String fullName, String specialty, String location, String bio, List<String> tags, List<Availability> availabilityDates, List<String> imageUrls, List<Pricing> pricingPlans, UserEntity user) {
         this.id = id;
         this.fullName = fullName;
         this.specialty = specialty;
@@ -48,7 +49,8 @@ public class PhotographerEntity {
         this.tags = tags;
         this.availabilityDates = availabilityDates;
         this.imageUrls = imageUrls;
-        this.pricingInfo = pricingInfo;
+        this.pricingPlans = pricingPlans;
+        this.user = user;
     }
 
     public Long getId() {
@@ -99,11 +101,11 @@ public class PhotographerEntity {
         this.tags = tags;
     }
 
-    public List<String> getAvailabilityDates() {
+    public List<Availability> getAvailabilityDates() {
         return availabilityDates;
     }
 
-    public void setAvailabilityDates(List<String> availabilityDates) {
+    public void setAvailabilityDates(List<Availability> availabilityDates) {
         this.availabilityDates = availabilityDates;
     }
 
@@ -115,11 +117,21 @@ public class PhotographerEntity {
         this.imageUrls = imageUrls;
     }
 
-    public String getPricingInfo() {
-        return pricingInfo;
+    public List<Pricing> getPricingPlans() {
+        return pricingPlans;
     }
 
-    public void setPricingInfo(String pricingInfo) {
-        this.pricingInfo = pricingInfo;
+    public void setPricingPlans(List<Pricing> pricingPlans) {
+        this.pricingPlans = pricingPlans;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 }
+
+
