@@ -33,6 +33,13 @@ public class PhotographerEntity {
     @CollectionTable(name = "photographer_pricing", joinColumns = @JoinColumn(name = "photographer_id"))
     private List<Pricing> pricingPlans;
 
+    @Embedded
+    private ContactInfo contactInfo;
+
+    @Embedded
+    private SocialMedia socialMedia;
+
+
     @OneToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
@@ -40,7 +47,7 @@ public class PhotographerEntity {
     public PhotographerEntity() {
     }
 
-    public PhotographerEntity(Long id, String fullName, String specialty, String location, String bio, List<String> tags, List<Availability> availabilityDates, List<String> imageUrls, List<Pricing> pricingPlans, UserEntity user) {
+    public PhotographerEntity(Long id, String fullName, String specialty, String location, String bio, List<String> tags, List<Availability> availabilityDates, List<String> imageUrls, List<Pricing> pricingPlans, ContactInfo contactInfo, SocialMedia socialMedia, UserEntity user) {
         this.id = id;
         this.fullName = fullName;
         this.specialty = specialty;
@@ -50,6 +57,8 @@ public class PhotographerEntity {
         this.availabilityDates = availabilityDates;
         this.imageUrls = imageUrls;
         this.pricingPlans = pricingPlans;
+        this.contactInfo = contactInfo;
+        this.socialMedia = socialMedia;
         this.user = user;
     }
 
@@ -125,6 +134,22 @@ public class PhotographerEntity {
         this.pricingPlans = pricingPlans;
     }
 
+    public ContactInfo getContactInfo() {
+        return contactInfo;
+    }
+
+    public void setContactInfo(ContactInfo contactInfo) {
+        this.contactInfo = contactInfo;
+    }
+
+    public SocialMedia getSocialMedia() {
+        return socialMedia;
+    }
+
+    public void setSocialMedia(SocialMedia socialMedia) {
+        this.socialMedia = socialMedia;
+    }
+
     public UserEntity getUser() {
         return user;
     }
@@ -133,5 +158,4 @@ public class PhotographerEntity {
         this.user = user;
     }
 }
-
 

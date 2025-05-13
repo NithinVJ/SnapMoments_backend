@@ -133,13 +133,15 @@ public class BookingService {
         BookingEntity booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found with id: " + bookingId));
 
-        // Validate that booking is in pending status
-        if (!"pending".equalsIgnoreCase(booking.getStatus())) {
-            throw new RuntimeException("Only pending bookings can be declined");
+        // Allow decline only if status is "pending" or "confirmed"
+        String status = booking.getStatus().toLowerCase();
+        if (!status.equals("pending") && !status.equals("confirmed")) {
+            throw new RuntimeException("Only pending or confirmed bookings can be declined");
         }
 
         booking.setStatus("declined");
         return bookingRepository.save(booking);
     }
+
 
 }

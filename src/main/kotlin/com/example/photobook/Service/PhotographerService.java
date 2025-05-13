@@ -53,6 +53,14 @@ public class PhotographerService {
         existingPhotographer.setTags(photographerData.getTags());
         existingPhotographer.setPricingPlans(photographerData.getPricingPlans());
         existingPhotographer.setAvailabilityDates(photographerData.getAvailabilityDates());
+        if (photographerData.getContactInfo() != null) {
+            existingPhotographer.setContactInfo(photographerData.getContactInfo());
+        }
+
+        // Update social media
+        if (photographerData.getSocialMedia() != null) {
+            existingPhotographer.setSocialMedia(photographerData.getSocialMedia());
+        }
 
         // Handle image updates
         if (files != null && !files.isEmpty()) {
@@ -66,7 +74,7 @@ public class PhotographerService {
                     }
                     Path filePath = uploadPath.resolve(filename);
                     Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                    newImageUrls.add("/" + UPLOAD_DIR + filename); // For serving via URL
+                    newImageUrls.add( filename); // For serving via URL
                 }
             }
             existingPhotographer.setImageUrls(newImageUrls);
